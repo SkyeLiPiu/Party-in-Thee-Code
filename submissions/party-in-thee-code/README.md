@@ -8,8 +8,8 @@ members and their contributions will be added with their work.
 Team branch: `submission/party-in-thee-code`. Project folder:
 `submissions/party-in-thee-code/`. Run the commands below from this folder.
 
-Starting point for Q1/Q2 and the team's later experiments. This is one baseline,
-not the full model comparison or the final Kaggle model.
+The original baseline remains available below. Q1 model comparison and tuning
+are now included in q1.py and q1_model_comparison.ipynb; see Q1_README.md.
 
 Python 3.11 or newer is needed for the pinned packages. The exact run environment
 is in `results/environment.json`.
@@ -24,15 +24,6 @@ can just be renamed. Open `baseline.ipynb` from this folder in Jupyter, or use:
 ```bash
 python baseline.py --train data/train.csv
 ```
-
-Q3 compares that supervised baseline with confidence-based pseudo-labeling.
-Put `unlabeled.csv` in `data/` and run:
-
-```bash
-python q3_pseudo_label.py --train data/train.csv --unlabeled data/unlabeled.csv
-```
-
-The script keeps the shared split, labels an unlabeled row only when `P(AI)` is at most 0.10 or at least 0.90, and refits the same pipeline. Validation rows are not used for fitting or for choosing pseudo-labels. The paired validation AUROCs are written to `results/q3_pseudo_metrics.csv`.
 
 The notebook has executed outputs already. Rerunning saves a new fit time and
 predictions. Timing depends on the machine, so compare runtimes from the same
@@ -57,8 +48,6 @@ Only the 8,000 training texts fit the vocabulary, IDF and classifier.
 Useful files:
 
 - `baseline.py`: shared data, split, model and evaluation functions.
-- `q3_pseudo_label.py`: unlabeled-data pseudo-labeling comparison.
-- `results/q3_pseudo_metrics.csv`: supervised and pseudo-label validation AUROC.
 - `baseline.ipynb`: executed baseline, split checks and metric output.
 - `results/baseline_metrics.csv`: training AUROC, validation AUROC and fit time.
 - `results/validation_predictions.csv`: IDs, labels, AI probabilities, word
@@ -81,12 +70,13 @@ can use their own copy of the supplied data with the same shared ID lists.
 ## AI assistance
 
 ChatGPT helped draft the baseline code and notes, execute the baseline and
-check the exported outputs. Cursor helped draft and run the Q3 pseudo-labeling
-script; the validation comparison was checked against the script output. The
-final report will also describe the team's own checks and later changes.
+check the exported outputs. The final report will also describe the team's
+own checks and later changes.
 
 ## Current status
 
-Baseline and the Q3 unlabeled-data comparison are in the branch. The remaining
-Q1 comparisons, Q2 learning curves, other teammate experiments and the final
-Kaggle prediction command are still in progress.
+Q1 comparison and tuning are complete. The current Q1 choice is character
+TF-IDF + linear SVM (C=1), with training-only sigmoid calibration for probability
+output. Its validation AUROC is 0.970704. Q1 results are under results/q1/.
+Q2 learning curves, teammate experiments and the final Kaggle prediction
+command are still in progress.
