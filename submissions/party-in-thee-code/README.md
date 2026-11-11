@@ -69,8 +69,8 @@ can use their own copy of the supplied data with the same shared ID lists.
 
 ## AI assistance
 
-ChatGPT helped draft the baseline code and notes, execute the baseline and
-check the exported outputs. The final report will also describe the team's
+ChatGPT helped draft and debug the baseline and Q1/Q2 code and notes,
+execute the experiments and check the exported outputs. The final report will also describe the team's
 own checks and later changes.
 
 ## Current status
@@ -78,5 +78,12 @@ own checks and later changes.
 Q1 comparison and tuning are complete. The current Q1 choice is character
 TF-IDF + linear SVM (C=1), with training-only sigmoid calibration for probability
 output. Its validation AUROC is 0.970704. Q1 results are under results/q1/.
-Q2 learning curves, teammate experiments and the final Kaggle prediction
-command are still in progress.
+Q2 learning curves are also complete; see Q2_README.md and results/q2/.
+Teammate experiments and the final Kaggle prediction command are still in progress.
+
+## Q2 learning curves
+
+Use `python -m pip install -r requirements_q2.txt`, then
+`python q2.py --train data/train.csv`, or open q2_learning_curve.ipynb.
+The original split and Q1 settings are reused. Results and both figure formats
+are saved under results/q2/.
