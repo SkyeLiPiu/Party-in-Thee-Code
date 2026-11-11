@@ -25,6 +25,15 @@ can just be renamed. Open `baseline.ipynb` from this folder in Jupyter, or use:
 python baseline.py --train data/train.csv
 ```
 
+Q3 compares that supervised baseline with confidence-based pseudo-labeling.
+Put `unlabeled.csv` in `data/` and run:
+
+```bash
+python q3_pseudo_label.py --train data/train.csv --unlabeled data/unlabeled.csv
+```
+
+The script keeps the shared split, labels an unlabeled row only when `P(AI)` is at most 0.10 or at least 0.90, and refits the same pipeline. Validation rows are not used for fitting or for choosing pseudo-labels. The paired validation AUROCs are written to `results/q3_pseudo_metrics.csv`.
+
 The notebook has executed outputs already. Rerunning saves a new fit time and
 predictions. Timing depends on the machine, so compare runtimes from the same
 environment for later experiments.
@@ -48,6 +57,8 @@ Only the 8,000 training texts fit the vocabulary, IDF and classifier.
 Useful files:
 
 - `baseline.py`: shared data, split, model and evaluation functions.
+- `q3_pseudo_label.py`: unlabeled-data pseudo-labeling comparison.
+- `results/q3_pseudo_metrics.csv`: supervised and pseudo-label validation AUROC.
 - `baseline.ipynb`: executed baseline, split checks and metric output.
 - `results/baseline_metrics.csv`: training AUROC, validation AUROC and fit time.
 - `results/validation_predictions.csv`: IDs, labels, AI probabilities, word
@@ -70,10 +81,12 @@ can use their own copy of the supplied data with the same shared ID lists.
 ## AI assistance
 
 ChatGPT helped draft the baseline code and notes, execute the baseline and
-check the exported outputs. The final report will also describe the team's
-own checks and later changes.
+check the exported outputs. Cursor helped draft and run the Q3 pseudo-labeling
+script; the validation comparison was checked against the script output. The
+final report will also describe the team's own checks and later changes.
 
 ## Current status
 
-Baseline only. The remaining Q1 comparisons, Q2 learning curves, teammate
-experiments and final Kaggle prediction command are still in progress.
+Baseline and the Q3 unlabeled-data comparison are in the branch. The remaining
+Q1 comparisons, Q2 learning curves, other teammate experiments and the final
+Kaggle prediction command are still in progress.
