@@ -5,8 +5,8 @@ Kaggle team: **Party in Thee Code**.
 Team members:
 
 - Skye Li (yl4534): shared split, baseline, Q1 model comparison, Q2 learning curves.
-- Candice (GitHub Candice0313, NetID TODO): Q3 pseudo-labeling.
-- James Chen (jzc28): Q4 error analysis, Q5 improvement, final Kaggle pipeline.
+- Candice (GitHub Candice0313, yx772): Q3 pseudo-labeling, and the character 2-5 gram plus blank-line submission.
+- James Chen (jzc28): Q4 error analysis, Q5 improvement, and the newline pipeline in predict.py.
 
 Team branch: `submission/party-in-thee-code`. Project folder:
 `submissions/party-in-thee-code/`. Run the commands below from this folder.
@@ -81,25 +81,30 @@ python q3_pseudo_label.py --train data/train.csv   # Q3, writes results/q3_pseud
 python q4_error_analysis.py --train data/train.csv # Q4, writes results/q4/ (IDs only, no passages)
 python q5_improvement.py --train data/train.csv    # Q5 round 1 (v1-v3), about 3 min
 python q5_round2.py --train data/train.csv         # Q5 round 2 (v4-v6), about 1 min
-python predict.py --train data/train.csv --validate             # refit on 8,000 rows, check validation AUROC
-python predict.py --train data/train.csv --test data/test.csv   # final, writes submission.csv
-python q5_char_blank.py --train data/train.csv                 # char 2-5 grams plus a blank-line feature
+python predict.py --train data/train.csv --validate   # Q5 newline model, 8,000-row check
+python q5_char_blank.py --train data/train.csv        # current model, shared-split comparison
 python q5_char_blank.py --train data/train.csv --test data/test.csv --out submission.csv
 ```
 
-The final command fits on all 10,000 labeled rows and writes `submission.csv`
-(newline-aware char SVM, 3-fold sigmoid calibration). It also writes
-`submission_newline_ensemble.csv` and `submission_char_svm.csv` as the two
-alternatives to compare on the public leaderboard. All three are
-ignored by git. A full run took about 3 minutes on one CPU thread in our run.
+`q5_char_blank.py --test` is the current submission command. It fits on all
+10,000 labeled rows and writes `submission.csv`. The model is a character
+2-5 gram SVM plus a blank-line indicator. Combination weights come from
+3-fold out-of-fold scores on the training rows. On the shared validation
+split the clean AUROC is 0.9937, against 0.9917 for the newline model.
+With whitespace collapsed the scores are 0.9261 and 0.8887. The public
+leaderboard score for this submission is 0.95836.
+
+`predict.py` is the earlier Q5 pipeline. Its test run writes the newline-aware
+character SVM and two comparison files. That is not the current submission.
 
 Formatting artifact: in train.csv, 0% of human passages contain a blank line,
-against 66% of AI passages. scikit-learn's char analyzer collapses blank lines,
-so the Q1 model never saw this. Replacing each newline with "¶" exposes it.
-31.9% of test.csv passages contain a blank line (33.0% of train.csv), so the cue
-appears to carry over. If formatting were stripped, the model would get worse:
-when the validation whitespace is collapsed, its AUROC falls to 0.889, compared
-with 0.931 for the Q1 model.
+against 66% of AI passages. scikit-learn's character analyzer collapses blank
+lines, so the Q1 model never saw this. The newline model turns each newline
+into "¶" and reaches 0.9917, but collapsed whitespace drops it to 0.889.
+The current model keeps that cue as one feature. 31.9% of test.csv passages
+contain a blank line (33.0% of train.csv). Collapsed whitespace still lowers
+the current model, to 0.9261, and the public score is below the clean
+validation number.
 
 ## AI assistance
 
@@ -107,22 +112,17 @@ ChatGPT helped draft and debug the baseline and Q1/Q2 code and notes,
 execute the experiments and check the exported outputs. Claude (Anthropic)
 helped write and run the Q4, Q5 and predict.py code and draft the
 corresponding report text. The team reviewed the code, reran the commands and
-checked the numbers against the saved outputs. Candice: TODO, add how AI was used for Q3.
+checked the numbers against the saved outputs.
 No AI tool or external API labeled or scored the competition passages.
 
 ## Current status
-
-All experiments and the final Kaggle command are in place.
 
 - Q1: character TF-IDF + linear SVM (C=1), validation AUROC 0.970704 (results/q1/).
 - Q2: learning curves (Q2_README.md, results/q2/).
 - Q3: pseudo-labeling with the word LR baseline, no gain (results/q3_pseudo_metrics.json).
 - Q4: error analysis of the Q1 model (results/q4/).
-- Q5: two rounds of improvements (results/q5/). Keeping newlines visible to the
-  char model raised validation AUROC to 0.991701, but makes the model depend on a
-  formatting artifact (see below).
-- Character 2-5 grams plus a blank-line feature (q5_char_blank.py). On the shared split its clean validation AUROC is 0.9937, compared with 0.9917 for the newline model. Collapsed whitespace scores 0.9261 versus 0.8887.
-- Final model in predict.py: Q5 v4 (newline-aware char SVM), retrained on all 10,000 rows.
+- Q5: newline-aware character SVM, validation AUROC 0.991701. Collapsed whitespace falls to 0.889 (results/q5/). `predict.py` still runs this model.
+- Current submission: character 2-5 grams plus a blank-line feature (`q5_char_blank.py`). Shared-split AUROC 0.9937 clean and 0.9261 with whitespace collapsed. Public leaderboard 0.95836.
 
 ## Q2 learning curves
 
