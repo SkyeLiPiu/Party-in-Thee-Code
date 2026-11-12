@@ -2,8 +2,11 @@
 
 Kaggle team: **Party in Thee Code**.
 
-Current contributor: Skye Li (yl4534), baseline and Q1/Q2. The other team
-members and their contributions will be added with their work.
+Team members:
+
+- Skye Li (yl4534): shared split, baseline, Q1 model comparison, Q2 learning curves.
+- Candice (GitHub Candice0313, NetID TODO): Q3 pseudo-labeling.
+- James Chen (jzc28): Q4 error analysis, Q5 improvement, final Kaggle pipeline.
 
 Team branch: `submission/party-in-thee-code`. Project folder:
 `submissions/party-in-thee-code/`. Run the commands below from this folder.
@@ -67,19 +70,56 @@ source leakage were not assessed because source metadata are unavailable.
 Raw CSVs and model checkpoints are excluded from this repository and ignored by git. Everyone
 can use their own copy of the supplied data with the same shared ID lists.
 
+## Q3 to Q5 and the final submission
+
+Put train.csv, unlabeled.csv and test.csv in data/. Each command runs from this
+folder with `requirements_q2.txt` installed, uses seed 42 and the shared split,
+and limits BLAS to one thread. Results go to results/ as JSON or Markdown.
+
+```bash
+python q3_pseudo_label.py --train data/train.csv   # Q3, writes results/q3_pseudo_metrics.*
+python q4_error_analysis.py --train data/train.csv # Q4, writes results/q4/ (IDs only, no passages)
+python q5_improvement.py --train data/train.csv    # Q5 round 1 (v1-v3), about 3 min
+python q5_round2.py --train data/train.csv         # Q5 round 2 (v4-v6), about 1 min
+python predict.py --train data/train.csv --validate             # refit on 8,000 rows, check validation AUROC
+python predict.py --train data/train.csv --test data/test.csv   # final, writes submission.csv
+```
+
+The final command fits on all 10,000 labeled rows and writes `submission.csv`
+(newline-aware char SVM, 3-fold sigmoid calibration). It also writes
+`submission_newline_ensemble.csv` and `submission_char_svm.csv` as the two
+alternatives to compare on the public leaderboard. All three are
+ignored by git. A full run took about 3 minutes on one CPU thread in our run.
+
+Formatting artifact: in train.csv, 0% of human passages contain a blank line,
+against 66% of AI passages. scikit-learn's char analyzer collapses blank lines,
+so the Q1 model never saw this. Replacing each newline with "¶" exposes it.
+31.9% of test.csv passages contain a blank line (33.0% of train.csv), so the cue
+appears to carry over. If formatting were stripped, the model would get worse:
+when the validation whitespace is collapsed, its AUROC falls to 0.889, compared
+with 0.931 for the Q1 model.
+
 ## AI assistance
 
 ChatGPT helped draft and debug the baseline and Q1/Q2 code and notes,
-execute the experiments and check the exported outputs. The final report will also describe the team's
-own checks and later changes.
+execute the experiments and check the exported outputs. Claude (Anthropic)
+helped write and run the Q4, Q5 and predict.py code and draft the
+corresponding report text. The team reviewed the code, reran the commands and
+checked the numbers against the saved outputs. Candice: TODO, add how AI was used for Q3.
+No AI tool or external API labeled or scored the competition passages.
 
 ## Current status
 
-Q1 comparison and tuning are complete. The current Q1 choice is character
-TF-IDF + linear SVM (C=1), with training-only sigmoid calibration for probability
-output. Its validation AUROC is 0.970704. Q1 results are under results/q1/.
-Q2 learning curves are also complete; see Q2_README.md and results/q2/.
-Teammate experiments and the final Kaggle prediction command are still in progress.
+All experiments and the final Kaggle command are in place.
+
+- Q1: character TF-IDF + linear SVM (C=1), validation AUROC 0.970704 (results/q1/).
+- Q2: learning curves (Q2_README.md, results/q2/).
+- Q3: pseudo-labeling with the word LR baseline, no gain (results/q3_pseudo_metrics.json).
+- Q4: error analysis of the Q1 model (results/q4/).
+- Q5: two rounds of improvements (results/q5/). Keeping newlines visible to the
+  char model raised validation AUROC to 0.991701, but makes the model depend on a
+  formatting artifact (see below).
+- Final model: Q5 v4 (newline-aware char SVM), retrained on all 10,000 rows.
 
 ## Q2 learning curves
 
