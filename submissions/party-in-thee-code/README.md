@@ -83,6 +83,8 @@ python q5_improvement.py --train data/train.csv    # Q5 round 1 (v1-v3), about 3
 python q5_round2.py --train data/train.csv         # Q5 round 2 (v4-v6), about 1 min
 python predict.py --train data/train.csv --validate             # refit on 8,000 rows, check validation AUROC
 python predict.py --train data/train.csv --test data/test.csv   # final, writes submission.csv
+python q5_char_blank.py --train data/train.csv                 # char 2-5 grams plus a blank-line feature
+python q5_char_blank.py --train data/train.csv --test data/test.csv --out submission.csv
 ```
 
 The final command fits on all 10,000 labeled rows and writes `submission.csv`
@@ -119,7 +121,8 @@ All experiments and the final Kaggle command are in place.
 - Q5: two rounds of improvements (results/q5/). Keeping newlines visible to the
   char model raised validation AUROC to 0.991701, but makes the model depend on a
   formatting artifact (see below).
-- Final model: Q5 v4 (newline-aware char SVM), retrained on all 10,000 rows.
+- Character 2-5 grams plus a blank-line feature (q5_char_blank.py). On the shared split its clean validation AUROC is 0.9937, compared with 0.9917 for the newline model. Collapsed whitespace scores 0.9261 versus 0.8887.
+- Final model in predict.py: Q5 v4 (newline-aware char SVM), retrained on all 10,000 rows.
 
 ## Q2 learning curves
 
