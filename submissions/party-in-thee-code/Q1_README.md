@@ -80,8 +80,10 @@ model.fit(train.text, train.label)
 p_ai = model.predict_proba(val.text)[:, 1]
 ```
 
-The model is selected for Q1, not yet retrained on all 10,000 rows for Kaggle.
-The final team choice can change after Q3/Q5.
+The final Kaggle pipeline is implemented in predict.py. It uses the
+newline-aware character SVM selected after Q5, with training-only
+sigmoid calibration, and refits using all 10,000 labeled rows.
+The original Q1 model and its recorded results remain unchanged.
 
 AI assistance: ChatGPT helped write and debug Q1 code, execute the experiments,
 check outputs and format the LaTeX. The report should reflect the team's later
