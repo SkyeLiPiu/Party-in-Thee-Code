@@ -35,12 +35,18 @@ the 8,000 training texts. No unlabeled or Kaggle test texts are read by Q1.
 Each family is tuned using the same shared validation set, so the best score
 is a selection score rather than an unbiased final estimate.
 
-Current selected pipeline: character SVM, C=1. Validation AUROC:
-0.970704. For probabilities, it uses training-only 3-fold
-sigmoid calibration with ensemble=False. The cross-validation wraps the full
-TF-IDF pipeline, so each fold learns features only from its training portion.
-The final base estimator is fitted on all 8,000 training rows. Model-comparison
-times exclude this separate calibration fit (65.878 s in this run).
+Initial Q1 selection: character TF-IDF + linear SVM, C=1.
+Its validation AUROC was 0.970704. Training-only 3-fold sigmoid
+calibration with ensemble=False was used to produce probabilities.
+Each calibration fold fitted its own complete TF-IDF pipeline.
+The comparison fit time excludes the separate calibration fit,
+which took 65.878 seconds.
+
+After the Q5 experiments, the team selected the newline-aware
+character SVM for the final Kaggle pipeline. On the same validation
+split, its AUROC was 0.991701. This improvement and its dependence
+on formatting cues are discussed in Q5. The original Q1 comparison
+and Q2 learning curve are retained as controlled experiments.
 
 ## Files
 
